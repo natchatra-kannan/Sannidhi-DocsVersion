@@ -1,3 +1,4 @@
+import 'storage_service.dart';
 
 class AttendanceRecord {
   final String id;
@@ -21,6 +22,8 @@ class AttendanceRecord {
   });
 }
 
+
+
 class UserProfile {
   final String id;
   final String email;
@@ -30,8 +33,12 @@ class UserProfile {
   final int coinsReceived;
   final int coinsSent;
   final int coinsDeducted;
-  final int balance;
-  final List<String> achievements;
+  
+  int get balance => id == 'user-tony' ? StorageService.getCoinsBalance() : _balance;
+  final int _balance;
+
+  List<String> get achievements => id == 'user-tony' ? StorageService.getAchievements() : _achievements;
+  final List<String> _achievements;
 
   UserProfile({
     required this.id,
@@ -42,9 +49,10 @@ class UserProfile {
     required this.coinsReceived,
     required this.coinsSent,
     required this.coinsDeducted,
-    required this.balance,
-    required this.achievements,
-  });
+    required int balance,
+    required List<String> achievements,
+  })  : _balance = balance,
+        _achievements = achievements;
 }
 
 class Team {

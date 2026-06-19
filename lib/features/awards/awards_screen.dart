@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../services/mock_data.dart';
+import '../../services/storage_service.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
@@ -12,7 +13,7 @@ class AwardsScreen extends StatefulWidget {
 }
 
 class _AwardsScreenState extends State<AwardsScreen> {
-  final List<AwardNomination> _nominations = List.from(MockData.initialNominations);
+  late final List<AwardNomination> _nominations;
   
   // Form fields
   final _formKey = GlobalKey<FormState>();
@@ -28,6 +29,7 @@ class _AwardsScreenState extends State<AwardsScreen> {
   @override
   void initState() {
     super.initState();
+    _nominations = StorageService.getNominations();
     _reasonController.addListener(_onReasonChanged);
   }
 
@@ -82,6 +84,7 @@ class _AwardsScreenState extends State<AwardsScreen> {
         _reasonController.clear();
         _lastSavedAt = null;
       });
+      StorageService.saveNominations(_nominations);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nomination submitted successfully!')),
@@ -165,9 +168,10 @@ class _AwardsScreenState extends State<AwardsScreen> {
                           ),
                           const Divider(height: 24),
 
-                          // Category selector
+                           // Category selector
                           DropdownButtonFormField<String>(
                             value: _selectedCategory,
+                            isExpanded: true,
                             decoration: InputDecoration(
                               labelText: 'Tamil Value Category',
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -185,10 +189,11 @@ class _AwardsScreenState extends State<AwardsScreen> {
                             validator: (val) => val == null ? 'Please select category' : null,
                           ),
                           const SizedBox(height: 16),
-
+ 
                           // Nominee selector
                           DropdownButtonFormField<String>(
                             value: _selectedNominee,
+                            isExpanded: true,
                             decoration: InputDecoration(
                               labelText: 'Nominee Name',
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),

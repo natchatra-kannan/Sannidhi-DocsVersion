@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../services/mock_data.dart';
+import '../../services/storage_service.dart';
 import 'package:intl/intl.dart';
 import 'avenger_logos.dart';
 
@@ -13,16 +14,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _selectedCategory = 'all';
-  final List<CulturePost> _feedPosts = List.from(MockData.culturePosts);
+  late final List<CulturePost> _feedPosts;
   final Map<String, TextEditingController> _commentControllers = {};
   
   // Daily Pulse state
   int? _selectedPulseOption;
-  final Map<int, int> _pulseVotes = {0: 14, 1: 32, 2: 8, 3: 3};
+  late final Map<int, int> _pulseVotes;
   bool _hasVotedPulse = false;
 
   // Streak state
-  final int _streakDays = 5;
+  int _streakDays = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    _feedPosts = StorageService.getCulturePosts();
+    _selectedPulseOption = StorageService.getSelectedPulseOption();
+    _pulseVotes = StorageService.getPulseVotes();
+    _hasVotedPulse = StorageService.hasVotedPulse();
+    _streakDays = StorageService.getStreakDays();
+  }
 
   @override
   void dispose() {
@@ -56,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           comments: newComments,
           timestamp: post.timestamp,
         );
+        StorageService.saveCulturePosts(_feedPosts);
       }
       _commentControllers[postId]?.clear();
     });
@@ -80,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
           comments: post.comments,
           timestamp: post.timestamp,
         );
+        StorageService.saveCulturePosts(_feedPosts);
       }
     });
   }
@@ -89,6 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedPulseOption = optionIndex;
       _pulseVotes[optionIndex] = (_pulseVotes[optionIndex] ?? 0) + 1;
       _hasVotedPulse = true;
+      StorageService.saveSelectedPulseOption(_selectedPulseOption);
+      StorageService.savePulseVotes(_pulseVotes);
+      StorageService.saveHasVotedPulse(_hasVotedPulse);
     });
   }
 

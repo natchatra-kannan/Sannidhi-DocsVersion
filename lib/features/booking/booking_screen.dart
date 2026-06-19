@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 import '../../services/mock_data.dart';
+import '../../services/storage_service.dart';
 import 'package:intl/intl.dart';
 
 class BookingScreen extends StatefulWidget {
@@ -11,7 +12,7 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  final List<MeetingBooking> _bookings = List.from(MockData.initialBookings);
+  late final List<MeetingBooking> _bookings;
   String _selectedRoomId = 'room-helipad';
   
   // Form values
@@ -23,6 +24,12 @@ class _BookingScreenState extends State<BookingScreen> {
   
   String? _errorMessage;
   String? _successMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookings = StorageService.getBookings();
+  }
 
   @override
   void dispose() {
@@ -96,6 +103,7 @@ class _BookingScreenState extends State<BookingScreen> {
         _successMessage = 'Booking confirmed successfully!';
         _titleController.clear();
       });
+      StorageService.saveBookings(_bookings);
     }
   }
 

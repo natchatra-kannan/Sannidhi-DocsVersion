@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/mock_data.dart';
+import '../services/storage_service.dart';
 
 // -------------------------------------------------------------
 // REPOSITORY INTERFACES
@@ -179,7 +180,7 @@ class MockDirectoryRepositoryImpl implements DirectoryRepository {
 }
 
 class MockCultureRepositoryImpl implements CultureRepository {
-  final List<CulturePost> _posts = List.from(MockData.culturePosts);
+  final List<CulturePost> _posts = StorageService.getCulturePosts();
 
   @override
   Future<List<CulturePost>> getPosts() async {
@@ -202,6 +203,7 @@ class MockCultureRepositoryImpl implements CultureRepository {
       timestamp: DateTime.now(),
     );
     _posts.insert(0, newPost);
+    await StorageService.saveCulturePosts(_posts);
     return newPost;
   }
 
@@ -224,6 +226,7 @@ class MockCultureRepositoryImpl implements CultureRepository {
         comments: post.comments,
         timestamp: post.timestamp,
       );
+      await StorageService.saveCulturePosts(_posts);
     }
   }
 
@@ -248,12 +251,13 @@ class MockCultureRepositoryImpl implements CultureRepository {
         comments: newComments,
         timestamp: post.timestamp,
       );
+      await StorageService.saveCulturePosts(_posts);
     }
   }
 }
 
 class MockBookingRepositoryImpl implements BookingRepository {
-  final List<MeetingBooking> _bookings = List.from(MockData.initialBookings);
+  final List<MeetingBooking> _bookings = StorageService.getBookings();
 
   @override
   Future<List<MeetingRoom>> getRooms() async {
@@ -276,12 +280,13 @@ class MockBookingRepositoryImpl implements BookingRepository {
       endTime: end,
     );
     _bookings.add(newBooking);
+    await StorageService.saveBookings(_bookings);
     return newBooking;
   }
 }
 
 class MockNominationRepositoryImpl implements NominationRepository {
-  final List<AwardNomination> _nominations = List.from(MockData.initialNominations);
+  final List<AwardNomination> _nominations = StorageService.getNominations();
 
   @override
   Future<List<AwardNomination>> getNominations() async {
@@ -299,6 +304,7 @@ class MockNominationRepositoryImpl implements NominationRepository {
       timestamp: DateTime.now(),
     );
     _nominations.insert(0, newNomination);
+    await StorageService.saveNominations(_nominations);
   }
 
   @override
@@ -309,7 +315,7 @@ class MockNominationRepositoryImpl implements NominationRepository {
 }
 
 class MockAttendanceRepositoryImpl implements AttendanceRepository {
-  final List<AttendanceRecord> _records = List.from(MockData.attendanceRecords);
+  final List<AttendanceRecord> _records = StorageService.getAttendanceRecords();
 
   @override
   Future<List<AttendanceRecord>> getAttendanceRecords() async {
@@ -329,6 +335,7 @@ class MockAttendanceRepositoryImpl implements AttendanceRepository {
       isLate: isLate,
     );
     _records.insert(0, newRecord);
+    await StorageService.saveAttendanceRecords(_records);
     return newRecord;
   }
 }
