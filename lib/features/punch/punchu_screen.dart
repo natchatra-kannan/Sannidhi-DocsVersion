@@ -28,7 +28,7 @@ class _PunchuScreenState extends ConsumerState<PunchuScreen> {
   String? _locationError;
   bool _isDemoMode = false; // When true, sets current location as office coordinates for easy testing
   
-  final double _geofenceRadiusMeters = 100.0; // 100m radius
+  final double _geofenceRadiusMeters = 750.0; // 750m radius
 
   @override
   void initState() {
