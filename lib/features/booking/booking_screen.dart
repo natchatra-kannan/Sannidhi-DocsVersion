@@ -142,265 +142,288 @@ class _BookingScreenState extends State<BookingScreen> {
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Main Timeline and Rooms List
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Rooms Grid
-                    Text(
-                      'Select a Meeting Room',
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          child: Builder(
+            builder: (context) {
+              final double screenWidth = MediaQuery.of(context).size.width;
+              final bool isDesktop = screenWidth >= 900;
+
+              final leftPanel = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Rooms Grid
+                  Text(
+                    'Select a Meeting Room',
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 350,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: isDesktop ? 2.2 : 2.8,
                     ),
-                    const SizedBox(height: 12),
-                    GridView.builder(
+                    itemCount: MockData.meetingRooms.length,
+                    itemBuilder: (context, index) {
+                      final room = MockData.meetingRooms[index];
+                      final isSelected = room.id == _selectedRoomId;
+                      return Card(
+                        color: isSelected ? SannidhiTheme.teal.withOpacity(0.15) : null,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectedRoomId = room.id;
+                              _errorMessage = null;
+                              _successMessage = null;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  room.name,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: isSelected ? SannidhiTheme.teal : null,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text('Capacity: ${room.capacity} seats', style: const TextStyle(fontSize: 11)),
+                                Text(
+                                  room.location,
+                                  style: const TextStyle(fontSize: 11, color: SannidhiTheme.textMutedDark),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Daily Timeline Widget
+                  Text(
+                    'Today\'s Timeline (${currentRoom.name})',
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  if (roomBookings.isEmpty)
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Center(
+                          child: Text(
+                            'No bookings for this room today.',
+                            style: TextStyle(color: isDark ? SannidhiTheme.textMutedLight : SannidhiTheme.textMutedDark),
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 350,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: 2.2,
-                      ),
-                      itemCount: MockData.meetingRooms.length,
+                      itemCount: roomBookings.length,
                       itemBuilder: (context, index) {
-                        final room = MockData.meetingRooms[index];
-                        final isSelected = room.id == _selectedRoomId;
+                        final booking = roomBookings[index];
                         return Card(
-                          color: isSelected ? SannidhiTheme.teal.withOpacity(0.15) : null,
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                _selectedRoomId = room.id;
-                                _errorMessage = null;
-                                _successMessage = null;
-                              });
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    room.name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: isSelected ? SannidhiTheme.teal : null,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text('Capacity: ${room.capacity} seats', style: const TextStyle(fontSize: 11)),
-                                  Text(room.location, style: const TextStyle(fontSize: 11, color: SannidhiTheme.textMutedDark)),
-                                ],
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListTile(
+                            leading: const Icon(Icons.schedule, color: SannidhiTheme.teal),
+                            title: Text(booking.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            subtitle: Text(
+                              'Booked by ${booking.bookedBy}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            trailing: Text(
+                              '${DateFormat('hh:mm a').format(booking.startTime)} - ${DateFormat('hh:mm a').format(booking.endTime)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: SannidhiTheme.iceBlue,
+                                fontSize: 13,
                               ),
                             ),
                           ),
                         );
                       },
                     ),
-                    const SizedBox(height: 32),
+                ],
+              );
 
-                    // Daily Timeline Widget
-                    Text(
-                      'Today\'s Timeline (${currentRoom.name})',
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 12),
-                    if (roomBookings.isEmpty)
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(32.0),
-                          child: Center(
-                            child: Text(
-                              'No bookings for this room today.',
-                              style: TextStyle(color: isDark ? SannidhiTheme.textMutedLight : SannidhiTheme.textMutedDark),
+              final rightPanel = Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: const [
+                            Icon(Icons.add_box_rounded, color: SannidhiTheme.teal),
+                            SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                'Create Booking',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      )
-                    else
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: roomBookings.length,
-                        itemBuilder: (context, index) {
-                          final booking = roomBookings[index];
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: ListTile(
-                              leading: const Icon(Icons.schedule, color: SannidhiTheme.teal),
-                              title: Text(booking.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              subtitle: Text(
-                                'Booked by ${booking.bookedBy}',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              trailing: Text(
-                                '${DateFormat('hh:mm a').format(booking.startTime)} - ${DateFormat('hh:mm a').format(booking.endTime)}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: SannidhiTheme.iceBlue,
-                                  fontSize: 13,
-                                ),
-                              ),
+                        const Divider(height: 24),
+                        
+                        // Room indicator
+                        Text(
+                          'Room: ${currentRoom.name}',
+                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Meeting title
+                        TextFormField(
+                          controller: _titleController,
+                          decoration: InputDecoration(
+                            labelText: 'Meeting Title',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) return 'Please enter meeting title';
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Date picker
+                        ListTile(
+                          leading: const Icon(Icons.calendar_today_rounded, color: SannidhiTheme.teal),
+                          title: const Text('Date', style: TextStyle(fontSize: 12)),
+                          subtitle: Text(DateFormat('MMMM d, yyyy').format(_selectedDate), style: const TextStyle(fontWeight: FontWeight.bold)),
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: _selectedDate,
+                              firstDate: DateTime.now().subtract(const Duration(days: 1)),
+                              lastDate: DateTime.now().add(const Duration(days: 30)),
+                            );
+                            if (picked != null) {
+                              setState(() => _selectedDate = picked);
+                            }
+                          },
+                        ),
+                        const Divider(),
+
+                        // Start Time
+                        ListTile(
+                          leading: const Icon(Icons.access_time_rounded, color: SannidhiTheme.iceBlue),
+                          title: const Text('Start Time', style: TextStyle(fontSize: 12)),
+                          subtitle: Text(_startTime.format(context), style: const TextStyle(fontWeight: FontWeight.bold)),
+                          onTap: () async {
+                            final picked = await showTimePicker(
+                              context: context,
+                              initialTime: _startTime,
+                            );
+                            if (picked != null) {
+                              setState(() => _startTime = picked);
+                            }
+                          },
+                        ),
+                        const Divider(),
+
+                        // End Time
+                        ListTile(
+                          leading: const Icon(Icons.access_time_filled_rounded, color: SannidhiTheme.iceBlue),
+                          title: const Text('End Time', style: TextStyle(fontSize: 12)),
+                          subtitle: Text(_endTime.format(context), style: const TextStyle(fontWeight: FontWeight.bold)),
+                          onTap: () async {
+                            final picked = await showTimePicker(
+                              context: context,
+                              initialTime: _endTime,
+                            );
+                            if (picked != null) {
+                              setState(() => _endTime = picked);
+                            }
+                          },
+                        ),
+                        const Divider(),
+                        const SizedBox(height: 16),
+
+                        // Error/Success indicators
+                        if (_errorMessage != null)
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.red.withOpacity(0.3)),
                             ),
-                          );
-                        },
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 24),
-
-              // Create Booking Side Form
-              Expanded(
-                flex: 1,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.add_box_rounded, color: SannidhiTheme.teal),
-                              SizedBox(width: 8),
-                              Text('Create Booking', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                            ],
-                          ),
-                          const Divider(height: 24),
-                          
-                          // Room indicator
-                          Text(
-                            'Room: ${currentRoom.name}',
-                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Meeting title
-                          TextFormField(
-                            controller: _titleController,
-                            decoration: InputDecoration(
-                              labelText: 'Meeting Title',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w600),
                             ),
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) return 'Please enter meeting title';
-                              return null;
-                            },
                           ),
-                          const SizedBox(height: 16),
-
-                          // Date picker
-                          ListTile(
-                            leading: const Icon(Icons.calendar_today_rounded, color: SannidhiTheme.teal),
-                            title: const Text('Date', style: TextStyle(fontSize: 12)),
-                            subtitle: Text(DateFormat('MMMM d, yyyy').format(_selectedDate), style: const TextStyle(fontWeight: FontWeight.bold)),
-                            onTap: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: _selectedDate,
-                                firstDate: DateTime.now().subtract(const Duration(days: 1)),
-                                lastDate: DateTime.now().add(const Duration(days: 30)),
-                              );
-                              if (picked != null) {
-                                setState(() => _selectedDate = picked);
-                              }
-                            },
-                          ),
-                          const Divider(),
-
-                          // Start Time
-                          ListTile(
-                            leading: const Icon(Icons.access_time_rounded, color: SannidhiTheme.iceBlue),
-                            title: const Text('Start Time', style: TextStyle(fontSize: 12)),
-                            subtitle: Text(_startTime.format(context), style: const TextStyle(fontWeight: FontWeight.bold)),
-                            onTap: () async {
-                              final picked = await showTimePicker(
-                                context: context,
-                                initialTime: _startTime,
-                              );
-                              if (picked != null) {
-                                setState(() => _startTime = picked);
-                              }
-                            },
-                          ),
-                          const Divider(),
-
-                          // End Time
-                          ListTile(
-                            leading: const Icon(Icons.access_time_filled_rounded, color: SannidhiTheme.iceBlue),
-                            title: const Text('End Time', style: TextStyle(fontSize: 12)),
-                            subtitle: Text(_endTime.format(context), style: const TextStyle(fontWeight: FontWeight.bold)),
-                            onTap: () async {
-                              final picked = await showTimePicker(
-                                context: context,
-                                initialTime: _endTime,
-                              );
-                              if (picked != null) {
-                                setState(() => _endTime = picked);
-                              }
-                            },
-                          ),
-                          const Divider(),
-                          const SizedBox(height: 16),
-
-                          // Error/Success indicators
-                          if (_errorMessage != null)
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              margin: const EdgeInsets.only(bottom: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.red.withOpacity(0.3)),
-                              ),
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w600),
-                              ),
+                        if (_successMessage != null)
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: SannidhiTheme.teal.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: SannidhiTheme.teal.withOpacity(0.3)),
                             ),
-                          if (_successMessage != null)
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              margin: const EdgeInsets.only(bottom: 16),
-                              decoration: BoxDecoration(
-                                color: SannidhiTheme.teal.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: SannidhiTheme.teal.withOpacity(0.3)),
-                              ),
-                              child: Text(
-                                _successMessage!,
-                                style: const TextStyle(color: SannidhiTheme.teal, fontSize: 12, fontWeight: FontWeight.w600),
-                              ),
+                            child: Text(
+                              _successMessage!,
+                              style: const TextStyle(color: SannidhiTheme.teal, fontSize: 12, fontWeight: FontWeight.w600),
                             ),
+                          ),
 
-                          // Submit Button
-                          ElevatedButton(
-                            onPressed: _bookRoom,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: SannidhiTheme.teal,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            ),
-                            child: const Text('Confirm Booking', style: TextStyle(fontWeight: FontWeight.bold)),
-                          )
-                        ],
-                      ),
+                        // Submit Button
+                        ElevatedButton(
+                          onPressed: _bookRoom,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: SannidhiTheme.teal,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          child: const Text('Confirm Booking', style: TextStyle(fontWeight: FontWeight.bold)),
+                        )
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              );
+
+              return isDesktop
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 2, child: leftPanel),
+                        const SizedBox(width: 24),
+                        Expanded(flex: 1, child: rightPanel),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        leftPanel,
+                        const SizedBox(height: 24),
+                        rightPanel,
+                      ],
+                    );
+            },
           ),
         ),
       ),

@@ -117,6 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ? _feedPosts
         : _feedPosts.where((p) => p.type.toLowerCase() == _selectedCategory.toLowerCase()).toList();
 
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isDesktop = screenWidth >= 900;
+
     return SelectionArea(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -126,52 +129,99 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'S.NIDHI Culture Feed',
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Unified company-wide value alignment stream',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: isDark ? SannidhiTheme.textMutedLight : SannidhiTheme.textMutedDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Active Streak Widget
-                  Card(
-                    color: SannidhiTheme.teal.withOpacity(0.1),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.bolt, color: Colors.orange, size: 28),
-                          const SizedBox(width: 8),
-                          Column(
+              isDesktop
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '$_streakDays Day Streak',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                'S.NIDHI Culture Feed',
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              const Text('Gratitude Moments', style: TextStyle(fontSize: 11)),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Unified company-wide value alignment stream',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: isDark ? SannidhiTheme.textMutedLight : SannidhiTheme.textMutedDark,
+                                ),
+                              ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Active Streak Widget
+                        Card(
+                          color: SannidhiTheme.teal.withOpacity(0.1),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.bolt, color: Colors.orange, size: 28),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '$_streakDays Day Streak',
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                    const Text('Gratitude Moments', style: TextStyle(fontSize: 11)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'S.NIDHI Culture Feed',
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Unified company-wide value alignment stream',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isDark ? SannidhiTheme.textMutedLight : SannidhiTheme.textMutedDark,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Active Streak Widget
+                        Card(
+                          color: SannidhiTheme.teal.withOpacity(0.1),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.bolt, color: Colors.orange, size: 28),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '$_streakDays Day Streak',
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                    const Text('Gratitude Moments', style: TextStyle(fontSize: 11)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 24),
 
               Row(
