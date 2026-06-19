@@ -80,7 +80,7 @@ class SupabaseAuthRepositoryImpl implements AuthRepository {
   @override
   Stream<UserProfile?> authStateChanges() {
     return _client.auth.onAuthStateChange.asyncMap((event) async {
-      final user = event.user;
+      final user = event.session?.user;
       if (user == null) return null;
       try {
         final data = await _client.from('profiles').select().eq('id', user.id).single();
@@ -96,7 +96,7 @@ class SupabaseAuthRepositoryImpl implements AuthRepository {
       id: data['id'] as String,
       email: data['email'] as String,
       fullName: data['full_name'] as String,
-      role: data['role'] as String?,
+      role: data['role'] as String? ?? 'Member',
       avatarUrl: data['avatar_url'] as String? ?? '',
       coinsReceived: data['coins_received'] as int? ?? 0,
       coinsSent: data['coins_sent'] as int? ?? 0,
@@ -151,7 +151,7 @@ class SupabaseDirectoryRepositoryImpl implements DirectoryRepository {
       id: data['id'] as String,
       email: data['email'] as String,
       fullName: data['full_name'] as String,
-      role: data['role'] as String?,
+      role: data['role'] as String? ?? 'Member',
       avatarUrl: data['avatar_url'] as String? ?? '',
       coinsReceived: data['coins_received'] as int? ?? 0,
       coinsSent: data['coins_sent'] as int? ?? 0,

@@ -38,6 +38,11 @@ abstract class NominationRepository {
   Future<void> saveDraftNomination(String category, String nominee, String reason);
 }
 
+abstract class AttendanceRepository {
+  Future<List<AttendanceRecord>> getAttendanceRecords();
+  Future<AttendanceRecord> punchAttendance(String userName, String mode, double? latitude, double? longitude, bool isVerified, bool isLate);
+}
+
 // -------------------------------------------------------------
 // PROVIDERS (Defaulting to Mock, but swappable)
 // -------------------------------------------------------------
@@ -83,6 +88,33 @@ final nominationRepositoryProvider = Provider<NominationRepository>((ref) {
   }
   return ref.read(mockNominationRepositoryProvider);
 });
+
+final attendanceRepositoryProvider = Provider<AttendanceRepository>((ref) {
+  return ref.read(mockAttendanceRepositoryProvider);
+});
+
+final mockAttendanceRepositoryProvider = Provider<AttendanceRepository>((ref) => MockAttendanceRepositoryImpl());
+
+final attendanceStateProvider = StateNotifierProvider<AttendanceNotifier, List<AttendanceRecord>>((ref) {
+  final repo = ref.watch(attendanceRepositoryProvider);
+  return AttendanceNotifier(repo);
+});
+
+class AttendanceNotifier extends StateNotifier<List<AttendanceRecord>> {
+  final AttendanceRepository _repo;
+  AttendanceNotifier(this._repo) : super([]) {
+    loadRecords();
+  }
+
+  Future<void> loadRecords() async {
+    state = await _repo.getAttendanceRecords();
+  }
+
+  Future<void> punch(String userName, String mode, double? latitude, double? longitude, bool isVerified, bool isLate) async {
+    final record = await _repo.punchAttendance(userName, mode, latitude, longitude, isVerified, isLate);
+    state = [record, ...state];
+  }
+}
 
 // Providers for mock implementation details
 final mockAuthRepositoryProvider = Provider<AuthRepository>((ref) => MockAuthRepositoryImpl());
@@ -273,5 +305,30 @@ class MockNominationRepositoryImpl implements NominationRepository {
   Future<void> saveDraftNomination(String category, String nominee, String reason) async {
     // Simulated background autosave
     await Future.delayed(const Duration(milliseconds: 300));
+  }
+}
+
+class MockAttendanceRepositoryImpl implements AttendanceRepository {
+  final List<AttendanceRecord> _records = List.from(MockData.attendanceRecords);
+
+  @override
+  Future<List<AttendanceRecord>> getAttendanceRecords() async {
+    return _records;
+  }
+
+  @override
+  Future<AttendanceRecord> punchAttendance(String userName, String mode, double? latitude, double? longitude, bool isVerified, bool isLate) async {
+    final newRecord = AttendanceRecord(
+      id: 'att-${DateTime.now().millisecondsSinceEpoch}',
+      userName: userName,
+      timestamp: DateTime.now(),
+      mode: mode,
+      latitude: latitude,
+      longitude: longitude,
+      isVerified: isVerified,
+      isLate: isLate,
+    );
+    _records.insert(0, newRecord);
+    return newRecord;
   }
 }

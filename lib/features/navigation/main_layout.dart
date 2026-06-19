@@ -18,7 +18,8 @@ class MainLayout extends ConsumerWidget {
     if (location.startsWith('/makkal')) return 2;
     if (location.startsWith('/booking')) return 3;
     if (location.startsWith('/awards')) return 4;
-    if (location.startsWith('/profile')) return 5;
+    if (location.startsWith('/punch')) return 5;
+    if (location.startsWith('/profile')) return 6;
     return 0;
   }
 
@@ -40,6 +41,9 @@ class MainLayout extends ConsumerWidget {
         context.go('/awards');
         break;
       case 5:
+        context.go('/punch');
+        break;
+      case 6:
         context.go('/profile');
         break;
     }
@@ -62,6 +66,7 @@ class MainLayout extends ConsumerWidget {
       {'label': 'Makkal', 'icon': Icons.people_rounded},
       {'label': 'Booking', 'icon': Icons.meeting_room_rounded},
       {'label': 'Awards 25\'', 'icon': Icons.emoji_events_rounded},
+      {'label': 'Punchu', 'icon': Icons.check_circle_outline_rounded},
       {'label': 'Profile', 'icon': Icons.account_circle_rounded},
     ];
 

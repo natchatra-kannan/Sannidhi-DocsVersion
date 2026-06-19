@@ -8,6 +8,7 @@ import '../features/makkal/makkal_screen.dart';
 import '../features/booking/booking_screen.dart';
 import '../features/awards/awards_screen.dart';
 import '../features/profile/profile_screen.dart';
+import '../features/punch/punchu_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
@@ -45,6 +46,10 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/awards',
           builder: (BuildContext context, GoRouterState state) => const AwardsScreen(),
+        ),
+        GoRoute(
+          path: '/punch',
+          builder: (BuildContext context, GoRouterState state) => const PunchuScreen(),
         ),
         GoRoute(
           path: '/profile',

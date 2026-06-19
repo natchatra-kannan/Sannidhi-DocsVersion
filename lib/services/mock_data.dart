@@ -1,4 +1,26 @@
 
+class AttendanceRecord {
+  final String id;
+  final String userName;
+  final DateTime timestamp;
+  final String mode; // 'Work From Home' or 'Present in Office'
+  final double? latitude;
+  final double? longitude;
+  final bool isVerified;
+  final bool isLate;
+
+  AttendanceRecord({
+    required this.id,
+    required this.userName,
+    required this.timestamp,
+    required this.mode,
+    this.latitude,
+    this.longitude,
+    required this.isVerified,
+    required this.isLate,
+  });
+}
+
 class UserProfile {
   final String id;
   final String email;
@@ -390,6 +412,131 @@ class MockData {
       reason: 'Tony singlehandedly rewrote the deploy pipeline, speeding up releases from once a day to continuous delivery.',
       nominatorName: 'Steve Rogers',
       timestamp: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+  ];
+
+  static final List<AttendanceRecord> attendanceRecords = [
+    AttendanceRecord(
+      id: 'att-1',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 1, 9, 30),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-2',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 2, 10, 15),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-3',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 3, 11, 5),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: true,
+    ),
+    AttendanceRecord(
+      id: 'att-4',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 4, 10, 0),
+      mode: 'Work From Home',
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-5',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 5, 10, 45),
+      mode: 'Work From Home',
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-6',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 8, 9, 15),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-7',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 9, 11, 20),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: true,
+    ),
+    AttendanceRecord(
+      id: 'att-8',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 11, 10, 10),
+      mode: 'Work From Home',
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-9',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 12, 10, 25),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-10',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 15, 9, 45),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-11',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 16, 10, 48),
+      mode: 'Work From Home',
+      isVerified: true,
+      isLate: false,
+    ),
+    AttendanceRecord(
+      id: 'att-12',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 17, 12, 15),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: true,
+    ),
+    AttendanceRecord(
+      id: 'att-13',
+      userName: 'Tony Stark',
+      timestamp: DateTime(2026, 6, 18, 9, 50),
+      mode: 'Present in Office',
+      latitude: 13.0405,
+      longitude: 80.2415,
+      isVerified: true,
+      isLate: false,
     ),
   ];
 }
